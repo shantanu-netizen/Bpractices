@@ -2,28 +2,20 @@ import mongoose from "mongoose";
 const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const userSchema = mongoose.Schema(
   {
-    fname: {
-      type: String,
-      required: [true, "this field id required"],
-    },
-    lname: {
-      type: String,
-      required: [true, "this field id required"],
-    },
+    title: { type: String, mandatory: true, enum: ["Mr", "Mrs", "Miss"] },
+    name: { type: String, mandatory: true },
+    phone: { type: String, mandatory: true, unique: true },
     email: {
       type: String,
-      required: [true, "this field id required"],
-      match: [regex, "Format is not correct"],
+      mandatory: true,
+      match: [regex, "Fill valid email"],
+      unique: true,
     },
-    role: {
-      type: String,
-      required: [true, "this field id required"],
-      enum: ["user", "admin"],
-      default: "user",
-    },
-    password: {
-      type: String,
-      required: [true, "this field id required"],
+    password: { type: String, mandatory: true, minLen: 8, maxLen: 15 },
+    address: {
+      street: { type: String },
+      city: { type: String },
+      pincode: { type: String },
     },
   },
   { timestamps: true },
