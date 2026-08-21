@@ -1,5 +1,7 @@
 import userModel from "../models/user.mjs";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken"
+import config from "../../config.mjs";
 const user = async (req, res) => {
   try {
     const data = req.body;
@@ -35,8 +37,8 @@ const login = async (req, res)=>{
         if (!isPassword) {
            return res.status(400).send({ message: "Password is incorrect" });
         }
-        const token = jwt.sign({ userId: user._id }, { secretToken })
-        return res.status(200).send({ message: "login succesfully", data:{token} });
+        const token = jwt.sign({ userId: user._id },  config.secretToken )
+      return res.status(200).send({ message: "login succesfully", data: { token } });
     } catch (error) {
          return res
            .status(500)
