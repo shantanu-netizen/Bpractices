@@ -1,6 +1,7 @@
-import { Query } from "mongoose";
+import mongoose, { Query } from "mongoose";
 import bookModel from "../models/book.mjs";
 import userModel from "../models/user.mjs";
+import reviewModel from "../models/review.mjs";
 const createBook = async (req, res) => {
     try {
         const data = req.data
@@ -50,4 +51,28 @@ const getBook = async (req, res) => {
          return res.status(500).send({ status: false, error: error.message });
     }
 }
-export {createBook,getBook}
+const getBookId = async (res, req) => {
+    try {
+      const { bookId } = req.param;
+      if (!mongoose.Type.ObjectId.isValid(bookId)) {
+        return res.status(400).send({ message: "bookId is not valid" });
+      }
+      const book = await bookModel.find(bookId);
+      if (!book) {
+        return res.status(400).send({ message: "book not found" });
+      }
+      let reviews = await reviewModel
+        .find({ bookId: bookId })
+        .select("_id reviewedBy bookId reviewedAt rating review");
+      return res
+        .status(200)
+        .send({
+          status: true,
+          message: "book details",
+          data: { ...book._doc, reviewsData: reviews },
+        });
+    } catch (error) {
+      return res.status(500).send({ status: false, message: error.message });
+    }
+}
+export {createBook,getBook,getBookId}

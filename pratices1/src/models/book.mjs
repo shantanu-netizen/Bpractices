@@ -10,8 +10,6 @@ const bookSchema = mongoose.Schema({
   deletedAt: {type:Date, default: null}, 
   isDeleted: {type:Boolean, default: false},
   releasedAt: {type:Date, mandatory:true},
-  createdAt: {timestamp},
-  updatedAt: {timestamp},
 }, { timestamp: true })
 const bookModel = mongoose.model('book', bookSchema)
 export default bookModel;
