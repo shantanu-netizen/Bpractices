@@ -4,12 +4,12 @@ import userModel from "../models/user.mjs";
 import reviewModel from "../models/review.mjs";
 const createBook = async (req, res) => {
     try {
-        const data = req.data
+        const data = req.body
         const { userId } = data
-        if (!mongoose.Type.ObjectId.isValid(userId)) {
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
             return res.status(400).send({ message: "userId is not valid" })
         }
-        const user = await userModel.findById(user)
+        const user = await userModel.findById(userId)
         if (!user) {
             return res.status(400).send({ message: "user not found" });
         }
@@ -29,7 +29,7 @@ const getBook = async (req, res) => {
     try {
         const { userId, subcategory, category } = req.query
         if (userId) {
-            if (!mongoose.Type.ObjectId.isValid(userId)) {
+            if (!mongoose.Types.ObjectId.isValid(userId)) {
                 return res.status(400).send({message:"userId is not valid"})
             }
             query.userId=userId
