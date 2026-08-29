@@ -1,3 +1,4 @@
+import jwt from "jsonwebtoken";
 import userModel from "../models/userModels.mjs";
 import bcrypt from "bcrypt"
 
@@ -31,4 +32,26 @@ const register = async (req, res) => {
          }
     }
 }
-export { register };
+const login = async (req, res) => {
+    try {
+        const { email, password } = req.body
+        const user = await userModel.findOne({ email })
+        if (!user) {
+            return res.status(400).send({message:"user not found"})
+        }
+        const isPassword = await bcrypt.compare(password, userPassword)
+        if (!isPassword) {
+            return res.status(400).send({ message: "password is wrong" });
+        }
+        const token = jwt.sign({ userId: user._Id }, config.token)
+        if (!token) {
+             return res.status(400).send({ message: "Invalid Cerdentials" });
+        }
+        return res.status(200).send({message:"Login",data:token})
+    } catch (error) {
+         return res
+           .status(500)
+           .send({ message: "Internal server", error: error.message });
+    }
+}
+export { register, login };
