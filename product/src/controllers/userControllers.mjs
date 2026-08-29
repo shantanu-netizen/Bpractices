@@ -76,4 +76,36 @@ const Login = async (req, res) => {
       .send({ message: "failed", error: "Internal Server Error" });
   }
 }
-export {registerUser,Login}
+const getUser = async (req, res) => {
+  try {
+    const { userId } = req.params
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).send({message:"user id is not valid"})
+    }
+    const profile = await userModel.findOne({ userId })
+    if (!profile) {
+       return res.status(400).send({ message: "profile is not found" });
+    }
+    return res.status(201).send({message:"your data",status:true, data:profile})
+  } catch (error) {
+    return res
+      .status(500)
+      .send({ status: false, message: "failed", error: error.message });
+  }
+}
+const putUser = async (req, res) => {
+  try {
+    const { userId } = req.params
+    const update = req.body
+    const user = await userModel.findByIdAndUpdate(userId, update, { new: true })
+    if (!user) {
+      return res.status(400).send({ message: "profile is not found" });
+    }
+    return res.status(201).send({message:"Update Successfully", status:true, data:user})
+  } catch (error) {
+     return res
+      .status(500)
+      .send({ status: false, message: "failed", error: error.message });
+  }
+}
+export {registerUser,Login, getUser, putUser}
