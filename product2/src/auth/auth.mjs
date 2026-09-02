@@ -13,3 +13,4 @@ const authentation = async (req, res, next) => {
     req.user=decodedToken
     next()
 }
+export {authentation}

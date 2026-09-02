@@ -5,13 +5,13 @@ aws.config.update({
   accessKeyId: config.accessKey,
   region: config.region,
 });
-const s3 = new aws.s3({ apiVersion: "2006-03-01" });
-const uploadFiles = async (files) => {
+const s3 = new aws.S3({ apiVersion: "2006-03-01" });
+const uploadFiles = async (file) => {
   return new Promise((resolve, reject) => {
-    if (!files || !files.buffer) {
+    if (!file || !file.buffer) {
       return reject(new Error("Invalid file object: buffer is missing"));
     }
-    if (!files.originalname) {
+    if (!file.originalname) {
       return reject(
         new Error("Invalid file object: originalfiles name is missing"),
       );
@@ -19,10 +19,10 @@ const uploadFiles = async (files) => {
       const uploadParams = {
         ACL: "public-read",
         Bucket: "fsdclass",
-        Key: `Products/${Date.now()}-${files.originalname}`,
-        Body: files.buffer,
+        Key: `Products/${Date.now()}-${file.originalname}`,
+        Body: file.buffer,
       };
-      s3.upload(uploadParams, (err, date) => {
+      s3.upload(uploadParams, (err, data) => {
           if (err) {
               console.error("Error details:", {
                 code: err.code,
@@ -34,14 +34,14 @@ const uploadFiles = async (files) => {
               });
               return reject (err)
           }
-          if (!data || !data.location) {
+          if (!data || !data.Location) {
               return reject(
                 new Error(
                   "Failed to upload file: No location returned from S3",
                 ),
               );
           }
-           resolve(data.location)
+           resolve(data.Location)
       })
   });
 };

@@ -1,25 +1,27 @@
 import mongoose from "mongoose";
-const Email=/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-const userSchema = new mongoose.Schema({
-  fname: {type:String, mandatory:true},
-  lname: {type:String, mandatory:true},
-  email: {type:String, mandatory:true, Match:Email, unique:true},
-  profileImage: {type:String, mandatory:true}, // s3 link
-  phone: {type:String, mandatory:true, unique:true}, 
-  password: {type:String, mandatory:true, minLen: 8, maxLen: 15},
-  address: {
-    shipping: {
-      street: {type:String, mandatory:true},
-      city: {type:String, mandatory:true},
-      pincode: {type:String, mandatory:true}
+const Email = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+const userSchema = new mongoose.Schema(
+  {
+    fname: { type: String, required: true },
+    lname: { type: String, required: true },
+    email: { type: String, required: true, Match: Email, unique: true },
+    profileImage: { type: String, required: true }, // s3 link
+    phone: { type: String, required: true, unique: true },
+    password: { type: String, required: true, minLen: 8, maxLen: 15 },
+    address: {
+      shipping: {
+        street: { type: String, required: true },
+        city: { type: String, required: true },
+        pincode: { type: String, required: true },
+      },
+      billing: {
+        street: { type: String, required: true },
+        city: { type: String, required: true },
+        pincode: { type: String, required: true },
+      },
     },
-    billing: {
-      street: {type:String, mandatory:true},
-      city: {type:String, mandatory:true},
-      pincode: {type:String, mandatory:true}
-    }
   },
-}
-    , { timestamps: true })
-const userModel = new mongoose.model('user', userSchema)
-export default userModel
+  { timestamps: true },
+);
+const userModel = new mongoose.model("user", userSchema);
+export default userModel;
