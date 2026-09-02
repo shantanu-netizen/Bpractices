@@ -14,13 +14,11 @@ const product = async (req, res) => {
       return res.status(400).send({ message: "Product Image is not fetch" });
     }
     const product = await productModel.create(data);
-    return res
-      .status(200)
-      .send({
-        message: "product successfully fetch",
-        status: true,
-        data: product,
-      });
+    return res.status(200).send({
+      message: "product successfully fetch",
+      status: true,
+      data: product,
+    });
   } catch (error) {
     if (error.message.includes("validation")) {
       return res.status(400).send({ message: "failed", error: error.message });
@@ -34,26 +32,46 @@ const product = async (req, res) => {
   }
 };
 const getProduct = async (req, res) => {
-    try {
-        const { productId } = req.params
-        if (!mongoose.Types.ObjectId.isValid(productId)) {
-             return res
-               .status(400)
-               .send({ message: "Product Id is not valid" });
-        }
-        const product = await productModel.findById({ id: productId })
-        if (!product) {
-            return res.status(400).send({ message: "Product is not found" });
-        }
-         return res.status(200).send({
-           message: "product data",
-           status: true,
-           data: product,
-         });
-    } catch (error) {
-        return res
-        .status(500)
-        .send({ message: "failed", error: "Internal Server Error" });
-
+  try {
+    const { productId } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return res.status(400).send({ message: "Product Id is not valid" });
     }
-}
+    const product = await productModel.findById({ id: productId });
+    if (!product) {
+      return res.status(400).send({ message: "Product is not found" });
+    }
+    return res.status(200).send({
+      message: "product data",
+      status: true,
+      data: product,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .send({ message: "failed", error: "Internal Server Error" });
+  }
+};
+const putProduct = async (req, res) => {
+  try {
+    const { productId } = req.params;
+    const update = req.body;
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return res.status(400).send({ message: "product Id is not valid" });
+    }
+    const product = await userModel.findByIdAndUpdate(productId, update, {
+      new: true,
+    });
+    if (!product) {
+      return res.status(400).send({ message: "profile is not found" });
+    }
+    return res
+      .status(201)
+      .send({ message: "Update Successfully", status: true, data: product });
+  } catch (error) {
+      return res
+      .status(500)
+      .send({ message: "failed", error: "Internal Server Error" });
+  }
+};
+export {product,getProduct,putProduct}
