@@ -1,0 +1,22 @@
+{
+  "name": "day5",
+  "version": "1.0.0",
+  "description": "day5",
+  "main": "index.js",
+  "scripts": {
+    "start":"nodemon index.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shantanu-netizen/Bpractices.git"
+  },
+  "keywords": [
+    "heelo"
+  ],
+  "author": "shantanu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shantanu-netizen/Bpractices/issues"
+  },
+  "homepage": "https://github.com/shantanu-netizen/Bpractices#readme"
+}
