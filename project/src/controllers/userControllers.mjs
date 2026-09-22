@@ -134,6 +134,9 @@ const getUser = async (req, res) => {
 const updateUser = async (req, res) => {
   try {
     const { userId } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).send({ message: "user id is not valid" });
+    }
     const user = await userModel
       .findByIdAndUpdate(
         userId,
@@ -161,4 +164,118 @@ const updateUser = async (req, res) => {
       .send({ status: false, message: "failed", error: error.message });
   }
 };
-export { register, login, changePassword, getUser, updateUser };
+const updateAvatar = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).send({ message: "user id is not valid" });
+    }
+    const avatarLocalfile = req.files?.path;
+    if (!avatarLocalfile) {
+      return res
+        .status(400)
+        .send({
+          status: false,
+          message: "avatar local file missing",
+        });
+    }
+    const avatar = uploadOnCloud(avatarLocalfile);
+    if (!avatar||!avatar.url) {
+      return res.status(400).send({
+        status: false,
+        message: "avatar is missing",
+      });
+    }
+    const upload = await userModel.findByIdAndUpdate(userId, {
+      $set: {
+        avatar:avatar.url
+      }
+    }, { new: true })
+   
+    if (!upload) {
+      return res.status(404).send({
+        status: false,
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).send({
+      status: true,
+      message: "Avatar updated successfully",
+      data: upload,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .send({ status: false, message: "failed", error: error.message });
+  }
+};
+
+const updatecoverImage = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).send({
+        status: false,
+        message: "User id is not valid",
+      });
+    }
+
+    const coverLocalfile = req.file?.path;
+
+    if (!coverLocalfile) {
+      return res.status(400).send({
+        status: false,
+        message: "cover local file missing",
+      });
+    }
+
+    const cover = await uploadOnCloud(coverLocalfile);
+
+    if (!cover || !cover.secure_url) {
+      return res.status(400).send({
+        status: false,
+        message: "cover upload failed",
+      });
+    }
+
+    const upload = await userModel.findByIdAndUpdate(
+      userId,
+      {
+        $set: {
+          coverImage: coverLocalfile.url,
+        },
+      },
+      { new: true },
+    );
+
+    if (!upload) {
+      return res.status(404).send({
+        status: false,
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).send({
+      status: true,
+      message: "cover updated successfully",
+      data: upload,
+    });
+  } catch (error) {
+    return res.status(500).send({
+      status: false,
+      message: "Failed",
+      error: error.message,
+    });
+  }
+};
+export {
+  register,
+  login,
+  changePassword,
+  getUser,
+  updateUser,
+  updateAvatar,
+  updatecoverImage,
+};
