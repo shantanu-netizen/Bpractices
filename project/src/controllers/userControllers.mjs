@@ -172,26 +172,28 @@ const updateAvatar = async (req, res) => {
     }
     const avatarLocalfile = req.files?.path;
     if (!avatarLocalfile) {
-      return res
-        .status(400)
-        .send({
-          status: false,
-          message: "avatar local file missing",
-        });
+      return res.status(400).send({
+        status: false,
+        message: "avatar local file missing",
+      });
     }
     const avatar = uploadOnCloud(avatarLocalfile);
-    if (!avatar||!avatar.url) {
+    if (!avatar || !avatar.url) {
       return res.status(400).send({
         status: false,
         message: "avatar is missing",
       });
     }
-    const upload = await userModel.findByIdAndUpdate(userId, {
-      $set: {
-        avatar:avatar.url
-      }
-    }, { new: true })
-   
+    const upload = await userModel.findByIdAndUpdate(
+      userId,
+      {
+        $set: {
+          avatar: avatar.url,
+        },
+      },
+      { new: true },
+    );
+
     if (!upload) {
       return res.status(404).send({
         status: false,
@@ -270,6 +272,72 @@ const updatecoverImage = async (req, res) => {
     });
   }
 };
+const getUserChannel = async (req, res) => {
+  try {
+    const { username } = req.params;
+    if (!username) {
+      return res.status(404).send({ message: "user not found" });
+    }
+    const channels = await userModel.aggregate([
+      {
+        $match: {
+          username,
+        },
+      },
+      {
+        $lookup: {
+          from: "subscriptionModel",
+          localField: "_id",
+          foreignField: "channel",
+          as: "subscribers",
+        },
+      },
+      {
+        $lookup: {
+          from: "subscriptionModel",
+          localField: "_id",
+          foreignField: "subscription",
+          as: "subscribersTo",
+        },
+      },
+      {
+        $addFields: {
+          subscribersCount: {
+            $size: "$subscribers",
+          },
+          channelsSubscribedToCount: {
+            $size: "$subscribedTo",
+          },
+          isSubscribed: {
+            $cond: {
+              if: { $in: [req.user?._id, "$subscribers.subscriber"] },
+              then: true,
+              else: false,
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          fullName: 1,
+          username: 1,
+          subscribersCount: 1,
+          channelsSubscribedToCount: 1,
+          isSubscribed: 1,
+          avatar: 1,
+          coverImage: 1,
+          email: 1,
+        },
+      },
+    ]);
+    if (!channels) {
+      return res.status(404).send({ message: "channel not found" });
+    }
+    return res.status(200).send({ message: "your data", data: channels });
+  } catch (error) {
+    return res.status(500).send({ message: "Internal error" });
+  }
+};
 export {
   register,
   login,
@@ -278,4 +346,5 @@ export {
   updateUser,
   updateAvatar,
   updatecoverImage,
+  getUserChannel,
 };
