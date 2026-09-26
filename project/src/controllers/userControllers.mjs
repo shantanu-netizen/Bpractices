@@ -338,6 +338,61 @@ const getUserChannel = async (req, res) => {
     return res.status(500).send({ message: "Internal error" });
   }
 };
+const getWatchHistory = async (req, res) => {
+  try {
+    const { userId } = req.body
+    const History = await userModel.aggregate([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(userId),
+        },
+      },
+      {
+        $lookup: {
+          from: "Video",
+          localField: "WatchHistory",
+          foreignField: "_id",
+          as: "WatchHistory",
+          pipline: [
+            {
+              $lookup: {
+                from: "user",
+                localField: "owner",
+                foreignField: "_id",
+                as: "owner",
+                pipline: [
+                  {
+                    $project: {
+                      fullName: 1,
+                      username: 1,
+                      avatar: 1,
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              $addFields: {
+                owner: {
+                  $first: "$owner",
+                },
+              },
+            },
+          ],
+        },
+      },
+    ]);
+    return res
+      .status(200)
+      .send({ message: "your watch history", data: History });
+  } catch (error) {
+   return res.status(500).send({
+     status: false,
+     message: "Failed",
+     error: error.message,
+   });
+  }
+}
 export {
   register,
   login,
@@ -347,4 +402,5 @@ export {
   updateAvatar,
   updatecoverImage,
   getUserChannel,
+  getWatchHistory
 };
