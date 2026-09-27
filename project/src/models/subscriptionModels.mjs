@@ -6,8 +6,8 @@ const subscriptionSchema = new mongoose.Schema({
   },
   channel: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: "user",
   },
 }, { timestamps: true });
-const subscriptionModel = mongoose.model("subscription", subscriptionSchema)
+const subscriptionModel =new mongoose.model("subscription", subscriptionSchema)
 export default subscriptionModel
